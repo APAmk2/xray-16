@@ -1280,6 +1280,12 @@ bool CInventory::CanTakeItem(CInventoryItem* inventory_item) const
 
 u32 CInventory::BeltWidth() const
 {
+    bool actorHasOwnBelt = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "soc_actor_belt", ShadowOfChernobylMode);
+    if (actorHasOwnBelt)
+    {
+        return m_iMaxBelt;
+    }
+
     CActor* pActor = smart_cast<CActor*>(m_pOwner);
     if (pActor)
     {
@@ -1289,7 +1295,7 @@ u32 CInventory::BeltWidth() const
             return outfit->get_artefact_count();
         }
     }
-    return 0; // m_iMaxBelt;
+    return 0;
 }
 
 u32 CInventory::BeltMaxWidth() const
