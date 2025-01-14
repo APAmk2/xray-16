@@ -37,6 +37,13 @@ constexpr pcstr WPN_SILENCER = "wpn_silencer";
 constexpr pcstr WPN_GRENADE_LAUNCHER = "wpn_launcher";
 constexpr pcstr WPN_GRENADE_LAUNCHER_SOC = "wpn_grenade_launcher";
 
+constexpr pcstr DEFAULT_SCOPE_XML = // Since SoC doesn't have scopes.xml we have to hardcode this
+    R"(<w>
+  <wpn_crosshair x="0" y="0" width="1024" height="768">
+    <auto_static x="0" y="0" width="1024" height="768" stretch="1"/>
+  </wpn_crosshair>
+</w>)";
+
 BOOL b_toggle_weapon_aim = FALSE;
 
 static class CUIWpnScopeXmlManager : public pureUIReset, public pureAppEnd
@@ -536,11 +543,24 @@ void CWeapon::Load(LPCSTR section)
 
 void CWeapon::LoadScope(const shared_str& section)
 {
-    if (ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
-        return;
-    pWpnScopeXml.Init();
     R_ASSERT(m_UIScope);
-    CUIXmlInit::InitWindow(*pWpnScopeXml, section.c_str(), 0, m_UIScope);
+    if (ShadowOfChernobylMode)
+    {
+        CUIXml scopeXml;
+        scopeXml.Set(DEFAULT_SCOPE_XML);
+        CUIXmlInit::InitWindow(scopeXml, "wpn_crosshair", 0, m_UIScope);
+        CUIStatic* scopeStatic = nullptr;
+        if (m_UIScope->FindChild("auto_static_0"))
+        {
+            scopeStatic = static_cast<CUIStatic*>(m_UIScope->FindChild("auto_static_0"));
+            scopeStatic->InitTexture(*section);
+        }
+    }
+    else
+    {
+        pWpnScopeXml.Init();
+        CUIXmlInit::InitWindow(*pWpnScopeXml, section.c_str(), 0, m_UIScope);
+    }
 }
 
 void CWeapon::LoadFireParams(LPCSTR section)
