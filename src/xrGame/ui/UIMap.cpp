@@ -33,9 +33,13 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         levelIni = xr_new<CInifile>(map_cfg_fn);
     }
 
-    if (levelIni->section_exist("level_map"))
+    if (levelIni->section_exist("level_map") && !levelIni->line_exist("level_map", "x1")) // Ensuring that's not a SoC config, else - looking in the game.ltx
     {
         Init_internal(name, *levelIni, "level_map", sh_name);
+    }
+    else if (pGameIni->section_exist(name))
+    {
+        Init_internal(name, *pGameIni, name, sh_name);
     }
     else
     {
