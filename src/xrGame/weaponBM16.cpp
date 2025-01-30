@@ -80,6 +80,12 @@ void CWeaponBM16::PlayAnimIdleMoving()
 
 void CWeaponBM16::PlayAnimIdleSprint()
 {
+    if (pSettings->line_exist(*hud_sect, "anim_idle_sprint"))
+    {
+        PlayHUDMotion("anim_idle_sprint", "anim_idle", TRUE, this, GetState());
+        return;
+    }
+    
     switch (m_magazine.size())
     {
     case 0: PlayHUDMotion("anm_idle_sprint_0", "anim_idle", TRUE, this, GetState()); break;
